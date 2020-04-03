@@ -14,7 +14,6 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class TimeStamp implements Serializable {
     private static final long serialVersionUID = 1L;
-    // chieu chuyen lop timestamp vao model
     @CreatedDate
     @Column(name = "createdate",nullable = false,updatable = false)
     @JsonIgnore

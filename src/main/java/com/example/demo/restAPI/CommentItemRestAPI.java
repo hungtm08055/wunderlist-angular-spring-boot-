@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class CommentItemRestAPI {
 
@@ -33,36 +34,26 @@ public class CommentItemRestAPI {
     }
 
     @PostMapping("/comment/add")
-    public CommentItem add(@RequestBody CommentItemDTO commentItemDTO,@RequestParam(name = "task_id") long id)
+    public CommentItem add(@RequestBody CommentItemDTO commentItemDTO,@RequestParam(name = "id_task") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         CommentItem commentItem = new CommentItem();
         commentItem.setTitle(commentItemDTO.getTitle());
         commentItem.setTaskItem(taskItem.get());
-        return commentItemService.save(commentItem);
+        commentItem = commentItemService.save(commentItem);
+        return commentItem;
     }
 
-    @PutMapping("/comment/update")
-    public CommentItem update(@RequestBody CommentItemDTO commentItemDTO)
-    {
-        Optional<CommentItem> commentItem = commentItemService.findOne(commentItemDTO.getId());
-        CommentItem commentItem1 = commentItem.get();
-        commentItem1.setTitle(commentItemDTO.getTitle());
 
-        if (!commentItem.isPresent())
-        {
-            return null;
-        }
-        else
-        {
-            commentItemService.save(commentItem1);
-        }
-        return commentItem1;
-    }
-
-    @DeleteMapping("/comment/delete/{id}")
-    public void delete(long id)
+    @DeleteMapping("/comment/delete")
+    public void delete(@RequestParam(name = "id") long id)
     {
         commentItemService.delete(id);
+    }
+
+    @GetMapping("/comment/showComment")
+    public List<CommentItemDTO> findCommentItems(@RequestParam(name = "id_task") long id) {
+        List<CommentItemDTO> commentItemDTOS = commentItemService.findAllCommentByTask(id);
+        return commentItemDTOS;
     }
 }

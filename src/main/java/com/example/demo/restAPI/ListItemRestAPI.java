@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class ListItemRestAPI {
     @Autowired
@@ -54,7 +55,7 @@ public class ListItemRestAPI {
     }
 
     @PostMapping("/list/add")
-    public ListItem add(@Validated ListItemDTO listItemDTO, @RequestParam(name = "user_id") long id)
+    public ListItem add(@RequestBody ListItemDTO listItemDTO, @RequestParam(name = "user_id") long id)
     {
         Optional<User> user = userService.findOne(id);
         ListItem listItem = new ListItem();
@@ -62,11 +63,12 @@ public class ListItemRestAPI {
         listItem.setTitle(title.replace("\"",""));
         listItem.setEmail(listItemDTO.getEmail());
         listItem.setUser(user.get());
-        return listService.save(listItem);
+        listService.save(listItem);
+        return listItem;
     }
 
     @PutMapping("/list/update")
-    public ListItem update(@Validated ListItemDTO listItemDTO,@RequestParam(name = "id") long id)
+    public ListItem update(@RequestBody ListItemDTO listItemDTO,@RequestParam(name = "id") long id)
     {
         Optional<ListItem> listItem = listService.findOne(id);
         ListItem listItem1 = listItem.get();
@@ -84,8 +86,8 @@ public class ListItemRestAPI {
 
     }
 
-    @DeleteMapping("/list/delete/{id}")
-    public ResponseEntity<Void> deleteByID(@PathVariable("id") long id)
+    @DeleteMapping("/list/delete")
+    public ResponseEntity<Void> deleteByID(@RequestParam(name = "id") long id)
     {
        if (listService.delete(id)) {
            return new ResponseEntity<>(HttpStatus.OK);

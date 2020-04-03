@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class FileItemRestAPI {
     @Autowired
@@ -29,18 +30,6 @@ public class FileItemRestAPI {
     @Autowired
     TaskItemService taskItemService;
 
-    @GetMapping("file/getAll")
-    public List<FileItem> getAll()
-    {
-        return (List<FileItem>) fileItemService.findAll();
-    }
-
-    @GetMapping("file/getID/{id}")
-    public Optional<FileItem> getByID(@PathVariable("id") long id)
-    {
-        return fileItemService.findOne(id);
-    }
-
     @GetMapping("/file/showbyTaskID")
     public List<FileItemDTO> findFileItem(@RequestParam(name = "task_id") long id)
     {
@@ -48,33 +37,16 @@ public class FileItemRestAPI {
         return fileItemDTOS;
     }
 
-    @PutMapping("/file/update")
-    public FileItem update(@RequestBody FileItemDTO fileItemDTO)
-    {
-        Optional<FileItem> fileItem = fileItemService.findOne(fileItemDTO.getId());
-        FileItem fileItem1 = fileItem.get();
-        fileItem1.setTitle(fileItemDTO.getTitle());
 
-        if (!fileItem.isPresent())
-        {
-            return null;
-        }
-        else
-        {
-            fileItemService.save(fileItem1);
-        }
-        return fileItem1;
-    }
-
-    @DeleteMapping("file/getID/{id}")
-    public void delete(long id)
+    @DeleteMapping("file/getID")
+    public void delete(@RequestParam(name = "id") long id)
     {
         fileItemService.delete(id);
     }
 
     // POST: Sử lý Upload
-    @PostMapping(value = "/uploadOneFile")
-    public ModelAndView uploadOneFileHandlerPOST( HttpServletRequest request, Model model, @ModelAttribute("myUploadForm") MyUploadForm myUploadForm, @Validated FileItemDTO fileItemDTO,@RequestParam(name = "task_id") long id)
+    @PostMapping("/uploadOneFile")
+    public FileItem uploadOneFileHandlerPOST( HttpServletRequest request, Model model, @ModelAttribute("myUploadForm") MyUploadForm myUploadForm, @Validated FileItemDTO fileItemDTO,@RequestParam(name = "task_id") long id)
     // @ModelAttribute dung de map doi tuong MyUploadFỏrm da co ben client tu luc dang nhap truyen vao
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
@@ -84,16 +56,16 @@ public class FileItemRestAPI {
         fileItem.setId(fileItemDTO.getId());
         fileItem.setCreateDate(fileItemDTO.getCreateDate());
         fileItem.setTaskItem(taskItem.get());
-        fileItemService.save(fileItem);
-        ModelAndView modelAndView = new ModelAndView("hienthi.html");
-        return modelAndView;
+        fileItem = fileItemService.save(fileItem);
+        return fileItem;
     }
 
+//    https://o7planning.org/vi/11679/vi-du-upload-file-voi-spring-boot
     private String doUpload(HttpServletRequest request, Model model, //
                             MyUploadForm myUploadForm) {
 
         // Thư mục gốc upload file.
-        String uploadRootPath = "src/main/resources/static/upload";
+        String uploadRootPath = "src/main/resources/frontend/angular-app/src/assets/upload";
         System.out.println("uploadRootPath=" + uploadRootPath);
         String name = "";
         File uploadRootDir = new File(uploadRootPath);

@@ -6,14 +6,15 @@ import com.example.demo.domain.TaskItem;
 import com.example.demo.service.ListService;
 import com.example.demo.service.TaskItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
-
 public class TaskItemRestAPI {
     @Autowired
     TaskItemService taskItemService;
@@ -65,13 +66,15 @@ public class TaskItemRestAPI {
     {
         List<TaskItemDTO> taskItems = (List<TaskItemDTO>) taskItemService.findAllTaskByList(id,status);
         return taskItems;
+
     }
 
     @PostMapping("/task/add")
-    public TaskItem add(@Validated TaskItemDTO taskItemDTO, @RequestParam(name = "list_id") long id)
+    public TaskItem add(@RequestBody TaskItemDTO taskItemDTO, @RequestParam(name = "list_id") long id)
     {
         Optional<ListItem> listItem = listService.findOne(id);
         TaskItem taskItem = new TaskItem();
+        taskItem.setId(taskItemDTO.getId());
         taskItem.setTitle(taskItemDTO.getTitle().replace("\"",""));
         taskItem.setStatus(taskItemDTO.getStatus());
         taskItem.setStar(taskItemDTO.getStar());
@@ -79,11 +82,12 @@ public class TaskItemRestAPI {
         taskItem.setReminder(taskItemDTO.getReminder());
         taskItem.setCreateDate(taskItemDTO.getCreateDate());
         taskItem.setListItem(listItem.get());
-        return taskItemService.save(taskItem);
+        taskItem = taskItemService.save(taskItem);
+        return taskItem;
     }
 
     @PutMapping("/task/update")
-    public TaskItem update(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
+    public TaskItem update(@RequestBody TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         TaskItem taskItem1 = taskItem.get();
@@ -101,7 +105,7 @@ public class TaskItemRestAPI {
     }
 
     @PutMapping("/task/updateDuedate")
-    public TaskItem updateDuedate(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
+    public TaskItem updateDuedate(@RequestBody TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         TaskItem taskItem1 = taskItem.get();
@@ -119,7 +123,7 @@ public class TaskItemRestAPI {
     }
 
     @PutMapping("/task/updateReminder")
-    public TaskItem updateReminder(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
+    public TaskItem updateReminder(@RequestBody TaskItemDTO taskItemDTO,@RequestParam(name = "id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         TaskItem taskItem1 = taskItem.get();
@@ -136,13 +140,12 @@ public class TaskItemRestAPI {
         return taskItem1;
     }
 
-    @PutMapping("/task/markAsCompleted")
+    @PutMapping("/task/changeTaskStatus")
     public TaskItem markAsCompleted(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "status") long status,@RequestParam(name = "id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         TaskItem taskItem1 = taskItem.get();
 
-
         if (!taskItem.isPresent())
         {
             return null;
@@ -155,46 +158,8 @@ public class TaskItemRestAPI {
         return taskItem1;
     }
 
-    @PutMapping("/task/markAsUncompleted")
-    public TaskItem markAsUncompleted(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "status") long status,@RequestParam(name = "id") long id)
-    {
-        Optional<TaskItem> taskItem = taskItemService.findOne(id);
-        TaskItem taskItem1 = taskItem.get();
-
-
-        if (!taskItem.isPresent())
-        {
-            return null;
-        }
-        else
-        {
-            taskItem1.setStatus(taskItemDTO.getStatus());
-            taskItemService.save(taskItem1);
-        }
-        return taskItem1;
-    }
-
-    @PutMapping("/task/markAsStarred")
+    @PutMapping("/task/changeTaskStar")
     public TaskItem markAsStarred(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "star") long star,@RequestParam(name = "id") long id)
-    {
-        Optional<TaskItem> taskItem = taskItemService.findOne(id);
-        TaskItem taskItem1 = taskItem.get();
-
-
-        if (!taskItem.isPresent())
-        {
-            return null;
-        }
-        else
-        {
-            taskItem1.setStar(taskItemDTO.getStar());
-            taskItemService.save(taskItem1);
-        }
-        return taskItem1;
-    }
-
-    @PutMapping("/task/markAsUnStarred")
-    public TaskItem markAsUnStarred(@Validated TaskItemDTO taskItemDTO,@RequestParam(name = "star") long star,@RequestParam(name = "id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         TaskItem taskItem1 = taskItem.get();
@@ -217,12 +182,12 @@ public class TaskItemRestAPI {
     {
         List<TaskItemDTO> taskItems = (List<TaskItemDTO>) taskItemService.findTaskByID(id);
         return taskItems;
-
     }
 
-    @DeleteMapping("/task/delete/{id}")
-    public void delete(@PathVariable("id") long id)
+    @DeleteMapping("/task/delete")
+    public void delete(@RequestParam(name = "id") long id)
     {
         taskItemService.delete(id);
     }
+
 }

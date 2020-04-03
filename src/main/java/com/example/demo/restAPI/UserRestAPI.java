@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class UserRestAPI  {
     @Autowired
@@ -89,46 +90,33 @@ public class UserRestAPI  {
     }
 
     @PostMapping("/login")
-    public ModelAndView login(@Validated User u,HttpSession httpSession,String username,Long user_id,Model model)
+    public User login(@RequestBody User u,HttpSession httpSession)
     {
         User user1 = (User) userService.findAccount(u.getUsername(),u.getPassword());
         if (user1 == null) // if account doesnt exist
         {
-            ModelAndView modelAndView = new ModelAndView("/index.html");
-            modelAndView.addObject("notExist", "Account does not exist");
-            return modelAndView;
+            return null;
         }
         else // if match with DB -> go to home page
         {
-            ModelAndView modelAndView = new ModelAndView("/hienthi.html");
-            MyUploadForm myUploadForm = new MyUploadForm();
-            modelAndView.addObject("myUploadForm",myUploadForm);
-            httpSession.setAttribute("username",user1.getUsername());
-            httpSession.setAttribute("user_id",user1.getId());
-            return modelAndView;
+            return user1;
         }
     }
 
     @PostMapping("/register")
-    public Object add(@Validated User user) throws NoSuchAlgorithmException {
+    public ResponseEntity<Void> add(@RequestBody User user) {
         User user1 = (User) userService.findAccount(user.getUsername(),user.getPassword());
 
         if (user1 == null) // if account is available -> add new account
         {
-            MessageDigest messageDigest =MessageDigest.getInstance("md5");
             user.getUsername();
             user.getPassword();
             User save = userService.save(user);
-            ModelAndView modelAndView = new ModelAndView("/index.html");
-            modelAndView.addObject("success","Sign Up Success");
-            return modelAndView;
-
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         else // exist
         {
-                ModelAndView modelAndView = new ModelAndView("/sign-up.html");
-                modelAndView.addObject("exist","Account already exists");
-                return modelAndView;
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 
@@ -154,4 +142,3 @@ public class UserRestAPI  {
         userService.delete(id);
     }
 }
-//        httpresponeEntity
