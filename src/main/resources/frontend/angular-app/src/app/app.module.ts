@@ -18,7 +18,7 @@ import { List } from "./models/list.model";
 import { Task } from "./models/task.model";
 import { Subtask} from "./models/subtask.model";
 import { Comment } from "./models/comment.model";
-import { File } from "./models/file.model";
+import { FileModel } from "./models/file.model";
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,7 +44,7 @@ import { File } from "./models/file.model";
     Task,
     Subtask,
     Comment,
-    File,
+    FileModel,
   ],
   bootstrap: [AppComponent]
 })

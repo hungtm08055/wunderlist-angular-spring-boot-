@@ -7,6 +7,8 @@ import com.example.demo.domain.TaskItem;
 import com.example.demo.service.FileItemService;
 import com.example.demo.service.TaskItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +36,38 @@ public class FileItemRestAPI {
     @Autowired
     TaskItemService taskItemService;
 
-    @GetMapping("/file/showbyTaskID")
+    List<String> files = new ArrayList<String>();
+    private final Path rootLocation = Paths.get("_Path_To_Save_The_File");
+
+    @PostMapping("/savefile")
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+        String message;
+        try {
+            try {
+                Files.copy(file.getInputStream(), this.rootLocation.resolve("file_name.pdf"));
+            } catch (Exception e) {
+                throw new RuntimeException("FAIL!");
+            }
+            files.add(file.getOriginalFilename());
+
+            message = "Successfully uploaded!";
+            return ResponseEntity.status(HttpStatus.OK).body(message);
+        } catch (Exception e) {
+            message = "Failed to upload!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
+    }
+
+
+
+    @GetMapping("/file/showFilebyTaskID")
     public List<FileItemDTO> findFileItem(@RequestParam(name = "task_id") long id)
     {
         List<FileItemDTO> fileItemDTOS = fileItemService.findFileByTaskID(id);
         return fileItemDTOS;
     }
 
-
-    @DeleteMapping("file/getID")
+    @DeleteMapping("file/delete")
     public void delete(@RequestParam(name = "id") long id)
     {
         fileItemService.delete(id);
@@ -46,12 +75,14 @@ public class FileItemRestAPI {
 
     // POST: Sử lý Upload
     @PostMapping("/uploadOneFile")
-    public FileItem uploadOneFileHandlerPOST( HttpServletRequest request, Model model, @ModelAttribute("myUploadForm") MyUploadForm myUploadForm, @Validated FileItemDTO fileItemDTO,@RequestParam(name = "task_id") long id)
-    // @ModelAttribute dung de map doi tuong MyUploadFỏrm da co ben client tu luc dang nhap truyen vao
+    public FileItem uploadOneFileHandlerPOST( HttpServletRequest request
+            , Model model,@ModelAttribute("file") MultipartFile[] file,
+                                              @Validated FileItemDTO fileItemDTO,
+                                              @RequestParam(name = "task_id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         FileItem fileItem = new FileItem();
-        String name = this.doUpload(request, model, myUploadForm);
+        String name = this.doUpload(request, model, file);
         fileItem.setTitle(name);
         fileItem.setId(fileItemDTO.getId());
         fileItem.setCreateDate(fileItemDTO.getCreateDate());
@@ -60,9 +91,18 @@ public class FileItemRestAPI {
         return fileItem;
     }
 
+//    @PostMapping("/file/upload")
+//    public ResponseEntity uploadVideoForExercise(@RequestHeader("file") MultipartFile file) throws IOException {
+//        if (fileItemService.storeFile(file)) {
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
 //    https://o7planning.org/vi/11679/vi-du-upload-file-voi-spring-boot
     private String doUpload(HttpServletRequest request, Model model, //
-                            MyUploadForm myUploadForm) {
+                            MultipartFile[] file) {
 
         // Thư mục gốc upload file.
         String uploadRootPath = "src/main/resources/frontend/angular-app/src/assets/upload";
@@ -74,7 +114,7 @@ public class FileItemRestAPI {
             uploadRootDir.mkdirs();
         }
 
-        MultipartFile[] fileDatas = myUploadForm.getFileDatas();
+        MultipartFile[] fileDatas = file;
         //
         List<File> uploadedFiles = new ArrayList<File>();
         List<String> failedFiles = new ArrayList<String>();
@@ -106,6 +146,5 @@ public class FileItemRestAPI {
         model.addAttribute("uploadedFiles", uploadedFiles);
         model.addAttribute("failedFiles", failedFiles);
         return name;
-
     }
 }

@@ -446,7 +446,7 @@
         <div class="op5">
           <form style="display: flex">
             <div class="file-icon"><svg class="clip" width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve"> <g> <path id="XMLID_2_" d="M7,17c-1.335,0-2.591-0.521-3.536-1.465S2,13.336,2,12c0-1.335,0.52-2.591,1.464-3.536l5.312-5.312 c0.195-0.195,0.512-0.195,0.707,0s0.195,0.512,0,0.707L4.171,9.171C3.416,9.927,3,10.932,3,12s0.416,2.073,1.171,2.828 c1.511,1.512,4.146,1.512,5.657,0l6.441-6.441c0.473-0.472,0.732-1.1,0.732-1.768c0-0.668-0.26-1.296-0.732-1.768 c-0.945-0.945-2.592-0.943-3.535,0l-6.441,6.441c-0.39,0.39-0.39,1.024,0,1.414c0.378,0.377,1.036,0.377,1.414,0l4.562-4.562 c0.195-0.195,0.512-0.195,0.707,0s0.195,0.512,0,0.707l-4.562,4.562c-0.755,0.756-2.073,0.756-2.828,0 c-0.78-0.779-0.78-2.049,0-2.828l6.441-6.441c1.32-1.321,3.627-1.323,4.949,0c0.661,0.661,1.025,1.54,1.025,2.475 s-0.364,1.814-1.025,2.475l-6.441,6.441C9.591,16.479,8.335,17,7,17z"></path> </g> </svg></div>
-            <div class="file-input"><input type="file" name="file" id="file"/>
+            <div class="file-input"><input (change)="onFileSelected($event.target.files)" type="file" name="file" id="file"/>
               <input id="task_idOfFile" style="display: none" name="task_id" type="text" value="0">
             </div>
             <div class="input-file-hidden"><input type="submit" name="submit"></div>
@@ -457,18 +457,17 @@
           </form>
         </div>
       <!-- show file -->
-      <!-- origin element -->
-      <div class="file-list-fake">
+      <div class="file-list" *ngFor="let files of fileArray">
         <div class="file-list-layout">
           <div class="file-list-content">
             <!-- hien thi anh  -->
-            <div class="file-list-content-icon"><img width="40" height="40" src="../image/" alt=""></div>
+            <div class="file-list-content-icon"><img width="40" height="40" src="assets/upload/{{ files.title }}" alt=""></div>
             <div class="file-list-content-text">
-              <a href="../image/"><div class="file-list-content-text-imgname"></div></a>
+              <a href="assets/upload/{{ files.title }}"><div class="file-list-content-text-imgname">{{ files.title }}</div></a>
               <div class="file-list-content-text-time">
-                <img src="assert/text.png" style="border-radius:50%;" width="15" height="15" alt="">
-                <div class="file-list-content-text-timetext"></div>
-                <div class="file-remove">x</div>
+                <img src="assets/text.png" style="border-radius:50%;" width="15" height="15" alt="">
+                <div class="file-list-content-text-timetext">{{ files.createdate | date: 'dd/MM/yyyy' }}</div>
+                <div class="file-remove" (click)="toggleDeleteFileButton(files.id, files.title)">x</div>
               </div>
             </div>
           </div>
@@ -508,7 +507,7 @@
         <div class="datetime">
           {{ task_createDate | date: 'EEE , dd/MM/yyyy' }}
         </div>
-        <div class="trash-icon" (click)="deleteTask()"><svg class="trash" width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <g stroke="none" stroke-width="1" fill-rule="evenodd"> <g id="trash"> <path d="M12,3.5 C12,2.4 11.1,1.5 10,1.5 C8.9,1.5 8,2.4 8,3.5 L5.5,3.5 C4.68,3.5 4,4.18 4,5 L4,7 C4,7.28 4.22,7.5 4.5,7.5 L15.5,7.5 C15.78,7.5 16,7.28 16,7 L16,5 C16,4.18 15.32,3.5 14.5,3.5 L12,3.5 Z M10,2.5 C10.56,2.5 11,2.94 11,3.5 L9,3.5 C9,2.94 9.44,2.5 10,2.5 L10,2.5 Z M15,6.5 L5,6.5 L5,5 C5,4.72 5.22,4.5 5.5,4.5 L14.5,4.5 C14.78,4.5 15,4.72 15,5 L15,6.5 Z M14.5,8.5 C14.22,8.5 14,8.72 14,9 L14,16 C14,16.28 13.78,16.5 13.5,16.5 L6.5,16.5 C6.22,16.5 6,16.28 6,16 L6,9 C6,8.72 5.78,8.5 5.5,8.5 C5.22,8.5 5,8.72 5,9 L5,16 C5,16.82 5.68,17.5 6.5,17.5 L13.5,17.5 C14.32,17.5 15,16.82 15,16 L15,9 C15,8.72 14.78,8.5 14.5,8.5 L14.5,8.5 Z M9,9 C9,8.72 8.78,8.5 8.5,8.5 C8.22,8.5 8,8.72 8,9 L8,15 C8,15.28 8.22,15.5 8.5,15.5 C8.78,15.5 9,15.28 9,15 L9,9 Z M12,9 C12,8.72 11.78,8.5 11.5,8.5 C11.22,8.5 11,8.72 11,9 L11,15 C11,15.28 11.22,15.5 11.5,15.5 C11.78,15.5 12,15.28 12,15 L12,9 Z" id="j"></path> </g> </g> </svg></div>
+        <div class="trash-icon" (click)="toggleDeleteTaskConfirm()"><svg class="trash" width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <g stroke="none" stroke-width="1" fill-rule="evenodd"> <g id="trash"> <path d="M12,3.5 C12,2.4 11.1,1.5 10,1.5 C8.9,1.5 8,2.4 8,3.5 L5.5,3.5 C4.68,3.5 4,4.18 4,5 L4,7 C4,7.28 4.22,7.5 4.5,7.5 L15.5,7.5 C15.78,7.5 16,7.28 16,7 L16,5 C16,4.18 15.32,3.5 14.5,3.5 L12,3.5 Z M10,2.5 C10.56,2.5 11,2.94 11,3.5 L9,3.5 C9,2.94 9.44,2.5 10,2.5 L10,2.5 Z M15,6.5 L5,6.5 L5,5 C5,4.72 5.22,4.5 5.5,4.5 L14.5,4.5 C14.78,4.5 15,4.72 15,5 L15,6.5 Z M14.5,8.5 C14.22,8.5 14,8.72 14,9 L14,16 C14,16.28 13.78,16.5 13.5,16.5 L6.5,16.5 C6.22,16.5 6,16.28 6,16 L6,9 C6,8.72 5.78,8.5 5.5,8.5 C5.22,8.5 5,8.72 5,9 L5,16 C5,16.82 5.68,17.5 6.5,17.5 L13.5,17.5 C14.32,17.5 15,16.82 15,16 L15,9 C15,8.72 14.78,8.5 14.5,8.5 L14.5,8.5 Z M9,9 C9,8.72 8.78,8.5 8.5,8.5 C8.22,8.5 8,8.72 8,9 L8,15 C8,15.28 8.22,15.5 8.5,15.5 C8.78,15.5 9,15.28 9,15 L9,9 Z M12,9 C12,8.72 11.78,8.5 11.5,8.5 C11.22,8.5 11,8.72 11,9 L11,15 C11,15.28 11.22,15.5 11.5,15.5 C11.78,15.5 12,15.28 12,15 L12,9 Z" id="j"></path> </g> </g> </svg></div>
       </div>
     </div>
   </div>
@@ -982,7 +981,7 @@
     </div>
   </div>
   <!-- delete of file -->
-  <div class="delete-layout4">
+  <div class="delete-layout4" *ngIf="!showDeleteFileConfirm">
     <div class="delete-layout-background"></div>
     <div class="delete-layout-content">
       <div class="delete-layout-content1">
@@ -990,24 +989,20 @@
         </div>
         <div class="delete-layout-content1-text">
           <div class="delete-layout-content1-text1">File "
-            <div class="delete-layout-content1-text11"></div>
+            <div class="delete-layout-content1-text11">{{ title_file }}</div>
             " will be deleted forever.
           </div>
           <div class="delete-layout-content1-text2">You will not be able to undo this action.</div>
         </div>
       </div>
-      <!-- <form action="../php/Process/xulyDeleteComment.php" method="POST" class="delete-layout-content2"> -->
       <div class="delete-layout-content2">
         <div class="delete-layout-content2-input">
-          <div class="delete-layout-content2-inputt"><input type="submit" class="button-delete BD2"
+          <div class="delete-layout-content2-inputt"><input type="submit" (click)="deleteFile()" class="button-delete BD2"
                                                             value="Delete To-do" name="btncomment"></div>
-          <div class="delete-layout-content2-inputt-none"><input type="text" value="" name="id_flie"
-                                                                 id="idflie"></div>
           <div class="delete-layout-content2-inputt">
-            <button class="button-delete BD1">Cancel</button>
+            <button class="button-delete BD1" (click)="toggleDeleteFileButton('','')">Cancel</button>
           </div>
         </div>
-        <!-- </form> -->
       </div>
     </div>
   </div>

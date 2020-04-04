@@ -3033,7 +3033,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/hung/Downloads/demo/src/main/resources/frontend/angular-app/src/polyfills.ts */"./src/polyfills.ts");
+module.exports = __webpack_require__(/*! /home/hung/Downloads/Angular-Spring-Wunderlist/src/main/resources/frontend/angular-app/src/polyfills.ts */"./src/polyfills.ts");
 
 
 /***/ })

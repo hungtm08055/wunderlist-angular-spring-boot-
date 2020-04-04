@@ -2780,15 +2780,7 @@ body, html {
 }
 /* end contextmenu cho left inbox */
 /* delete layout */
-.delete-layout, .delete-layout1, .delete-layout2, .delete-layout3{
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: fixed;
-}
-.delete-layout4{
-  display: none;
+.delete-layout, .delete-layout1, .delete-layout2, .delete-layout3, .delete-layout4{
   top: 0;
   bottom: 0;
   left: 0;

@@ -5,7 +5,7 @@ import { List } from "../models/list.model";
 import { Task } from "../models/task.model";
 import { Subtask } from "../models/subtask.model";
 import { Comment } from "../models/comment.model";
-import { File } from "../models/file.model";
+import { FileModel } from "../models/file.model";
 
 @Injectable({ providedIn: 'root'})
 
@@ -148,11 +148,23 @@ export class HomeService {
   }
 
   // file api
-  addFileByTaskID(file: File, id_task: string) {
+  showFileByTaskID(id_task: string) : Observable<FileModel[]> {
     let params = new HttpParams();
     params = params.append('task_id', id_task);
-    return this.http.post<File>('http://localhost:8080/uploadOneFile', file, { params: params });
+    return this.http.get<Comment[]>('http://localhost:8080/file/showFilebyTaskID', { params: params });
   }
+  addFileByTaskID(file: FileModel, id_task: string, formData: FormData) : Observable<void>{
+    let params = new HttpParams();
+    params = params.append('task_id', id_task);
+    return this.http.post<void>('http://localhost:8080/uploadOneFile', formData, { params: params });
+  }
+
+  deleteFileByID(id_file: string) {
+    let params = new HttpParams();
+    params = params.append('id', id_file);
+    return this.http.delete('http://localhost:8080/file/delete', { params: params });
+  }
+
 }
 // https://www.techiediaries.com/angular-9-8-url-query-parameters-with-httpparams-and-fromstring/
 

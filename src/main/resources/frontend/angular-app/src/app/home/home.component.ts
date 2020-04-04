@@ -7,7 +7,7 @@ import { HomeService } from "./home.service";
 import { Task } from "../models/task.model";
 import { Subtask } from "../models/subtask.model";
 import { Comment } from "../models/comment.model";
-import { File } from "../models/file.model";
+import { FileModel } from "../models/file.model";
 
 @Component({
   selector: 'app-home',
@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit {
   task: Task;
   subTask: Subtask;
   comment: Comment;
-  file: File;
+  file: FileModel;
   public user_id: string;
   public username: string;
   public id_list: string;
@@ -32,10 +32,11 @@ export class HomeComponent implements OnInit {
   public title_subTask: string;
   public id_comment: string;
   public title_comment: string;
+  public id_file: string;
+  public title_file: string;
   public inputAddTask: string;
   public inputAddSubTask: string;
   public inputAddComment: string;
-  public inputAddFile: string;
   public statusAbove = '0';
   public statusBelow = '1';
   public unStarred = '0';
@@ -48,7 +49,9 @@ export class HomeComponent implements OnInit {
   showDeleteTaskConfirm = true;
   showDeleteSubTaskConFirm = true;
   showDeleteCommentConFirm = true;
+  showDeleteFileConfirm = true;
   showRight = true;
+  selectedFile = null;
   event: MouseEvent;
   clientX = 0;
   clientY = 0;
@@ -61,7 +64,7 @@ export class HomeComponent implements OnInit {
   public taskDetailArray: Task[] = [];
   public subTaskArray: Subtask[] = [];
   public commentArray: Comment[] = [];
-  private fileToUpload: File;
+  public fileArray: FileModel[] = [];
   constructor(private homeService: HomeService,
               private route: ActivatedRoute,
               private router: Router) {
@@ -88,7 +91,7 @@ export class HomeComponent implements OnInit {
     this.comment = new Comment();
 
     // declare file
-    this.file = new File();
+    this.file = new FileModel();
   }
 
   // style
@@ -181,6 +184,13 @@ export class HomeComponent implements OnInit {
     this.title_comment = title_comment;
     this.showDeleteCommentConFirm = !this.showDeleteCommentConFirm;
   }
+
+  toggleDeleteFileButton(id_file: string, title_file: string) {
+    this.id_file = id_file;
+    this.title_file = title_file;
+    this.showDeleteFileConfirm = !this.showDeleteFileConfirm;
+  }
+
   // list function
   showList() {
     this.homeService.showListByUser(this.user_id).subscribe(data => {
@@ -329,6 +339,7 @@ export class HomeComponent implements OnInit {
         this.showTaskDetail(this.id_task, this.title_task)
         this.showDeleteTaskConfirm = true;
         this.showRight = true;
+        this.middleStyle = 0;
       },error => { alert('Server error') }
     )
   }
@@ -343,6 +354,7 @@ export class HomeComponent implements OnInit {
         this.taskDetailArray = data;
         this.showSubTask();
         this.showComment();
+        this.showFile();
         console.log(this.taskDetailArray)
       },error => { alert('Server error') }
     )
@@ -351,6 +363,7 @@ export class HomeComponent implements OnInit {
   showTaskCreateDate(createDate: string) {
     this.task_createDate = createDate;
   }
+
   editTaskDueDate(dueDate: string, title_task: string) {
     this.title_task = title_task;
     this.task.duedate = dueDate;
@@ -467,12 +480,35 @@ export class HomeComponent implements OnInit {
   }
 
   // file function
+  onFileSelected(files : File[]) {
+    this.selectedFile = files;
+    this.addFile(files);
+  }
 
-  addFile() {
-    this.file.title = this.inputAddFile.replace("C:\\fakepath\\","");
-    this.homeService.addFileByTaskID(this.file, this.id_task).subscribe(
+  showFile() {
+    this.homeService.showFileByTaskID(this.id_task).subscribe(
+      data => {
+        this.fileArray = data;
+      },error => { alert('Server error') }
+    )
+  }
+  addFile(files: File[]) {
+    const formData = new FormData();
+    Array.from(files).forEach(f => formData.append('file', f));
+    this.file.title = this.selectedFile.name;
+    this.homeService.addFileByTaskID(this.file, this.id_task, formData).subscribe(
+      event => {
+        console.log("success");
+        this.showFile();
+      },error => { alert('Server error') }
+    )
+  }
+
+  deleteFile() {
+    this.homeService.deleteFileByID(this.id_file).subscribe(
       success => {
-        console.log('dasads')
+        this.showDeleteFileConfirm = true;
+        this.showFile();
       },error => { alert('Server error') }
     )
   }

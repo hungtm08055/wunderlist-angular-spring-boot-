@@ -4,9 +4,15 @@ import com.example.demo.DTO.ListItemDTO;
 import com.example.demo.DTO.TaskItemDTO;
 import com.example.demo.domain.TaskItem;
 import com.example.demo.repository.TaskItemRepository;
+import com.fasterxml.classmate.MemberResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +23,7 @@ public class TaskItemService {
 
     @Autowired
     TaskItemRepository taskItemRepository;
+    private MemberResolver fileStorageLocation;
 
     public List<TaskItemDTO> findAll()
     {
@@ -95,14 +102,5 @@ public class TaskItemService {
         return taskItemDTOS;
     }
 
-//    public TaskItem markAsCompeleted(long status,long id)
-//    {
-//        return taskItemRepository.markAsCompleted(status,id);
-//    }
-//
-//    public TaskItem markAsUncompeleted(long status,long id)
-//    {
-//        return taskItemRepository.markAsUncompleted(status,id);
-//    }
 }
 

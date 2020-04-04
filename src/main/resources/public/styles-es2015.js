@@ -338,7 +338,7 @@ if (content.locals) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/hung/Downloads/demo/src/main/resources/frontend/angular-app/src/styles.css */"./src/styles.css");
+module.exports = __webpack_require__(/*! /home/hung/Downloads/Angular-Spring-Wunderlist/src/main/resources/frontend/angular-app/src/styles.css */"./src/styles.css");
 
 
 /***/ })
