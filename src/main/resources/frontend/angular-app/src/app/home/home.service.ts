@@ -153,18 +153,26 @@ export class HomeService {
     params = params.append('task_id', id_task);
     return this.http.get<Comment[]>('http://localhost:8080/file/showFilebyTaskID', { params: params });
   }
+
   addFileByTaskID(file: FileModel, id_task: string, formData: FormData) : Observable<void>{
     let params = new HttpParams();
     params = params.append('task_id', id_task);
     return this.http.post<void>('http://localhost:8080/uploadOneFile', formData, { params: params });
   }
 
-  deleteFileByID(id_file: string) {
+  deleteFileByID(id_file: string,file_name: string) {
     let params = new HttpParams();
     params = params.append('id', id_file);
+    params = params.append('file_name', file_name);
     return this.http.delete('http://localhost:8080/file/delete', { params: params });
   }
 
+  // search
+  searchTask(inputTask: string) : Observable<Task[]> {
+    let params = new HttpParams();
+    params = params.append('keyword', inputTask);
+    return this.http.get<Task[]>('http://localhost:8080/search', { params: params });
+  }
 }
 // https://www.techiediaries.com/angular-9-8-url-query-parameters-with-httpparams-and-fromstring/
 

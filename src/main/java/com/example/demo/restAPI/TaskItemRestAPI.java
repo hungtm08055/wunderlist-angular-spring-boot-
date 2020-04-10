@@ -44,20 +44,11 @@ public class TaskItemRestAPI {
         return taskItem;
     }
 
-    @GetMapping("/search/{keyword}")
-    public TaskItem search(@PathVariable("keyword") String t)
+    @GetMapping("/search")
+    public List<TaskItemDTO> search(@RequestParam(name = "keyword") String t)
     {
-        TaskItem taskItem1 = taskItemService.findTaskItemName(t);
-
-        if (taskItem1 == null)
-        {
-            System.out.println("not found");
-        }
-        else
-        {
-            System.out.println("found " +t);
-        }
-        return taskItem1;
+        List<TaskItemDTO> taskItems = (List<TaskItemDTO>) taskItemService.findTaskItemName(t);
+        return taskItems;
     }
 
     //show task by list_id

@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -36,30 +37,6 @@ public class FileItemRestAPI {
     @Autowired
     TaskItemService taskItemService;
 
-    List<String> files = new ArrayList<String>();
-    private final Path rootLocation = Paths.get("_Path_To_Save_The_File");
-
-    @PostMapping("/savefile")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
-        String message;
-        try {
-            try {
-                Files.copy(file.getInputStream(), this.rootLocation.resolve("file_name.pdf"));
-            } catch (Exception e) {
-                throw new RuntimeException("FAIL!");
-            }
-            files.add(file.getOriginalFilename());
-
-            message = "Successfully uploaded!";
-            return ResponseEntity.status(HttpStatus.OK).body(message);
-        } catch (Exception e) {
-            message = "Failed to upload!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-        }
-    }
-
-
-
     @GetMapping("/file/showFilebyTaskID")
     public List<FileItemDTO> findFileItem(@RequestParam(name = "task_id") long id)
     {
@@ -68,21 +45,23 @@ public class FileItemRestAPI {
     }
 
     @DeleteMapping("file/delete")
-    public void delete(@RequestParam(name = "id") long id)
+    public void delete(@RequestParam(name = "id") long id, @RequestParam(name = "file_name") String filename)
     {
+        String path = "src/main/resources/frontend/angular-app/src/assets/upload/" + filename;
+        File file = new File(path);
+        file.delete();
         fileItemService.delete(id);
     }
 
-    // POST: Sử lý Upload
+    // POST: Xử lý Upload
     @PostMapping("/uploadOneFile")
-    public FileItem uploadOneFileHandlerPOST( HttpServletRequest request
-            , Model model,@ModelAttribute("file") MultipartFile[] file,
+    public FileItem uploadOneFileHandlerPOST(@ModelAttribute("file") MultipartFile[] file,
                                               @Validated FileItemDTO fileItemDTO,
                                               @RequestParam(name = "task_id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
         FileItem fileItem = new FileItem();
-        String name = this.doUpload(request, model, file);
+        String name = this.doUpload(file);
         fileItem.setTitle(name);
         fileItem.setId(fileItemDTO.getId());
         fileItem.setCreateDate(fileItemDTO.getCreateDate());
@@ -91,18 +70,8 @@ public class FileItemRestAPI {
         return fileItem;
     }
 
-//    @PostMapping("/file/upload")
-//    public ResponseEntity uploadVideoForExercise(@RequestHeader("file") MultipartFile file) throws IOException {
-//        if (fileItemService.storeFile(file)) {
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
 //    https://o7planning.org/vi/11679/vi-du-upload-file-voi-spring-boot
-    private String doUpload(HttpServletRequest request, Model model, //
-                            MultipartFile[] file) {
+    private String doUpload(MultipartFile[] file) {
 
         // Thư mục gốc upload file.
         String uploadRootPath = "src/main/resources/frontend/angular-app/src/assets/upload";
@@ -122,7 +91,11 @@ public class FileItemRestAPI {
         for (MultipartFile fileData : fileDatas) {
 
             // Tên file gốc tại Client.
-            name = fileData.getOriginalFilename();
+            Random random = new Random();
+            int number = random.nextInt((10000 - 1) + 1) + 1;
+
+            name = fileData.getOriginalFilename().replace(".", number + ".");
+
             System.out.println("Client File Name = " + name);
 
             if (name != null && name.length() > 0) {
@@ -142,9 +115,17 @@ public class FileItemRestAPI {
                 }
             }
         }
-//        model.addAttribute("description", description);
-        model.addAttribute("uploadedFiles", uploadedFiles);
-        model.addAttribute("failedFiles", failedFiles);
         return name;
     }
 }
+
+
+
+//    @PostMapping("/file/upload")
+//    public ResponseEntity uploadVideoForExercise(@RequestHeader("file") MultipartFile file) throws IOException {
+//        if (fileItemService.storeFile(file)) {
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+//        }
+//    }

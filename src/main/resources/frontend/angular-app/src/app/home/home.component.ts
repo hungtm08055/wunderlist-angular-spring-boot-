@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { formatDate } from "@angular/common";
-import { interval } from 'rxjs';
+import {interval, Subscription} from 'rxjs';
 import { List } from "../models/list.model";
 import { HomeService } from "./home.service";
 import { Task } from "../models/task.model";
@@ -37,10 +37,12 @@ export class HomeComponent implements OnInit {
   public inputAddTask: string;
   public inputAddSubTask: string;
   public inputAddComment: string;
+  public inputSearch: string;
   public statusAbove = '0';
   public statusBelow = '1';
   public unStarred = '0';
   public starred = '1';
+  secondsCounter;
   showEditList = true;
   showAddList = true;
   showDeleteListButton = true;
@@ -50,7 +52,10 @@ export class HomeComponent implements OnInit {
   showDeleteSubTaskConFirm = true;
   showDeleteCommentConFirm = true;
   showDeleteFileConfirm = true;
+  showLogoutButton = true;
+  showAlertLayout = true;
   showRight = true;
+  public autoLoad: string;
   selectedFile = null;
   event: MouseEvent;
   clientX = 0;
@@ -65,6 +70,8 @@ export class HomeComponent implements OnInit {
   public subTaskArray: Subtask[] = [];
   public commentArray: Comment[] = [];
   public fileArray: FileModel[] = [];
+  public searchResultArray: Task[] = [];
+  subscription: Subscription;
   constructor(private homeService: HomeService,
               private route: ActivatedRoute,
               private router: Router) {
@@ -98,6 +105,7 @@ export class HomeComponent implements OnInit {
   clickOutside() {
     this.showDeleteListButton = true;
     this.showDeleteTaskButton = true;
+    this.showLogoutButton = true;
   }
 
   toggleAddList() {
@@ -149,13 +157,23 @@ export class HomeComponent implements OnInit {
     this.task.title = '';
     this.showTaskUncompleted();
     this.showTaskCompleted();
-    const secondsCounter = interval(30000);
-    secondsCounter.subscribe(success => {
-      this.currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
-      this.currentTime = formatDate(new Date(), 'HH:mm', 'en');
-      this.showTaskUncompleted();
-      this.showTaskCompleted();
-    })
+    this.inputSearch = '';
+    this.searchResultArray = null;
+    this.autoLoad = 'true';
+    if (this.autoLoad === 'true') {
+      this.secondsCounter = interval(3000);
+      this.subscription = this.secondsCounter.subscribe(success => {
+        this.currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
+        this.currentTime = formatDate(new Date(), 'HH:mm', 'en');
+        this.showAlertLayout = true;
+        this.showTaskUncompleted();
+        this.showTaskCompleted();
+        console.log(this.autoLoad+" --- subscribe")
+      });
+    } else {
+        this.subscription.unsubscribe();
+        console.log(this.autoLoad+" --- unsubscribed");
+    }
   }
 
   toggleShowRight() {
@@ -189,6 +207,21 @@ export class HomeComponent implements OnInit {
     this.id_file = id_file;
     this.title_file = title_file;
     this.showDeleteFileConfirm = !this.showDeleteFileConfirm;
+  }
+
+  toggleAlertLayout() {
+    this.showAlertLayout = false;
+  }
+
+  toggleLogoutButton() {
+    this.showLogoutButton = !this.showLogoutButton;
+  }
+
+  //logout
+  logOut() {
+    this.router.navigate(['index']);
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('user_id');
   }
 
   // list function
@@ -381,6 +414,7 @@ export class HomeComponent implements OnInit {
     this.task.reminder = reminder;
     this.homeService.updateReminderByID(this.task, this.id_task).subscribe(
       success => {
+        this.showAlertLayout = true;
         this.showTaskUncompleted();
         this.showTaskCompleted();
         this.showTaskDetail(this.id_task, this.title_task);
@@ -492,6 +526,7 @@ export class HomeComponent implements OnInit {
       },error => { alert('Server error') }
     )
   }
+
   addFile(files: File[]) {
     const formData = new FormData();
     Array.from(files).forEach(f => formData.append('file', f));
@@ -504,12 +539,37 @@ export class HomeComponent implements OnInit {
     )
   }
 
-  deleteFile() {
-    this.homeService.deleteFileByID(this.id_file).subscribe(
+  deleteFile(title_file: string) {
+    this.homeService.deleteFileByID(this.id_file, title_file).subscribe(
       success => {
         this.showDeleteFileConfirm = true;
         this.showFile();
       },error => { alert('Server error') }
     )
   }
+
+  // show search result
+  searchResult(inputSearch: string) {
+    this.autoLoad = 'false';
+    console.log(this.autoLoad+" --- run search input")
+    this.inputSearch = inputSearch;
+    if (this.inputSearch.trim() == '') {
+      this.homeService.searchTask(this.inputSearch).subscribe(
+        data => {
+          this.searchResultArray = null;
+        }
+      )
+    } else {
+      this.homeService.searchTask(this.inputSearch).subscribe(
+        data => {
+          this.searchResultArray = data;
+          this.taskArrayAbove = null;
+          this.taskArrayBelow = null;
+        }
+      )
+    }
+
+  }
 }
+
+//https://stackblitz.com/edit/angular-file-upload?file=app%2Fapp.component.ts

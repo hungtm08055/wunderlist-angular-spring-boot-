@@ -2719,7 +2719,7 @@ body, html {
 /* end layout-footer */
 /* end layout phụ của .createlist */
 /* context menu cho menu trái */
-.left-contextmenu{
+.left-contextmenu,.logout-context{
   position: fixed;
   width: 200px;
   height: 40px;
@@ -2729,11 +2729,11 @@ body, html {
   border-radius: 3px;
   z-index: 2;
 }
-.LC1,.LC2,.LC3,.LC4,.LC5,.LC6,.LC7,.LC8{
+.LC1,.LC2,.LC3,.LC4,.LC5,.LC6,.LC7,.LC8,.logoutBtn{
   display: flex;
   cursor: pointer;
 }
-.LC1:hover,.LC2:hover,.LC3:hover,.LC4:hover,.LC5:hover,.LC6:hover,.LC7:hover,.LC8:hover{
+.LC1:hover,.LC2:hover,.LC3:hover,.LC4:hover,.LC5:hover,.LC6:hover,.LC7:hover,.LC8:hover,.logoutBtn:hover{
   background-color: #ecd8d8;
 }
 .LC-icon{
@@ -2743,7 +2743,7 @@ body, html {
   cursor: pointer;
   padding: 8px;
 }
-.LC-text{
+.LC-text,.logout-text{
   padding: 8px;
 }
 .LC1,.LC4,.LC6{
@@ -2780,20 +2780,13 @@ body, html {
 }
 /* end contextmenu cho left inbox */
 /* delete layout */
-.delete-layout, .delete-layout1, .delete-layout2, .delete-layout3, .delete-layout4{
+.delete-layout, .delete-layout1, .delete-layout2, .delete-layout3, .delete-layout4,.delete-layout5{
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   position: fixed;
-}
-.delete-layout5{
-  display: block;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: fixed;
+  z-index: 2;
 }
 .delete-layout-background{
   position: absolute;

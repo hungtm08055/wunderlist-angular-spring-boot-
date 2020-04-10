@@ -3,6 +3,8 @@ package com.example.demo.DTO;
 import com.example.demo.domain.TimeStamp;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
+
 public class FileItemDTO extends TimeStamp {
     public long id;
 

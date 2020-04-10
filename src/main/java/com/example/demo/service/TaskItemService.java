@@ -59,9 +59,23 @@ public class TaskItemService {
         taskItemRepository.deleteById(id);
     }
 
-    public TaskItem findTaskItemName(String title)
+    public List<TaskItemDTO> findTaskItemName(String title)
     {
-        return taskItemRepository.findAllByTitle(title);
+        List<TaskItem> taskItems = (List<TaskItem>) taskItemRepository.findAllByTitle(title);
+        List<TaskItemDTO> taskItemDTOS = new ArrayList<>();
+        for (TaskItem taskItem : taskItems)
+        {
+            TaskItemDTO taskItemDTO = new TaskItemDTO();
+            taskItemDTO.setId((int) taskItem.getId());
+            taskItemDTO.setTitle(taskItem.getTitle());
+            taskItemDTO.setStatus(taskItem.getStatus());
+            taskItemDTO.setStar(taskItem.getStar());
+            taskItemDTO.setDuedate(taskItem.getDuedate());
+            taskItemDTO.setReminder(taskItem.getReminder());
+            taskItemDTO.setCreatedate(taskItem.getCreateDate().toEpochMilli());
+            taskItemDTOS.add(taskItemDTO);
+        }
+        return taskItemDTOS;
     }
 
     public List<TaskItemDTO> findAllTaskByList(long id,long status)
