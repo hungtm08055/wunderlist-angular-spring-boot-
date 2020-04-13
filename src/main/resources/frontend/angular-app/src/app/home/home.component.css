@@ -20,7 +20,6 @@ body, html {
   text-decoration: none;
   color: #262626;
 }
-
 .main{
   width: 100%;
   height: 100vh;
@@ -45,87 +44,8 @@ body, html {
 ::-webkit-scrollbar-thumb{
   background-color: #b9b9b9;
 }
-@media only screen and (max-width: 1000px) {
-  #left-responsive {
-    width: 42px ;
-  }
-  .left{
-    width: 42px;
-  }
-  .search-input{
-    display: none  ;
-  }
-  .search-icon{
-    display: none ;
-  }
-  .username{
-    display: none ;
-  }
-  .option{
-    display: none ;
-  }
-  .comment-notify{
-    display: none ;
-  }
-  .noti{
-    display: none ;
-  }
-  .mess{
-    display: none  ;
-  }
-  .ds1text{
-    display: none ;
-  }
-  .count{
-    display: none ;
-  }
-  .ds2text{
-    display: none ;
-  }
-  .ds3text{
-    display: none ;
-  }
-  .ds4text{
-    display: none ;
-  }
-  .ds5text{
-    display: none ;
-  }
-  .ds6text{
-    display: none ;
-  }
-  .ds7text{
-    display: none ;
-  }
-  .plustext{
-    display: none ;
-  }
-}
-@media only screen and (max-width: 1000px){
-  /* .middle{
-      margin-left: 42px ;
-      margin-right: 368px;
-  } */
-}
-@media only screen and (max-width: 1000px){
-  .hiddenclass{
-    display:block ;
-  }
-}
-@media only screen and (max-width: 500px){
-  .right{
-    width: 500px !important ;
-  }
-  .left{
-    display: none;
-  }
-  .middle{
-    display: none;
-  }
-}
 /* left */
 .left{
-  width: 280px;
   height: 100vh;
   float: left;
   background-color: #fafafa;
@@ -173,6 +93,7 @@ body, html {
 .scroll-left{
   height: 86%;
   overflow: auto;
+  overflow-x: hidden;
 }
 .usertool{
   padding-bottom: 5px;
@@ -532,7 +453,6 @@ body, html {
 }
 /* right */
 .right{
-  width: 367px;
   height: 100vh;
   float: right;
   background-color: #fafafa;
@@ -582,8 +502,7 @@ body, html {
 }
 .bodylist{
   width: 100%;
-  position: relative;
-  height: 514px;
+  height: 80%;
   overflow: auto;
   padding-bottom: 10px;
   border-bottom: 1px solid #ebebeb;
@@ -930,6 +849,7 @@ body, html {
 }
 .right-bottom{
   bottom: 0;
+  width: 100%;
   position: absolute;
 }
 .input-fake{
@@ -944,7 +864,7 @@ body, html {
 }
 .textarea input{
   margin: 6px;
-  width: 50vh;
+  width: 336px;
   outline: none;
   border: none;
 }
@@ -991,7 +911,6 @@ body, html {
 }
 /* middle */
 .middle{
-  margin-left: 280px;
   background-color: transparent;
   position: relative;
   height: 100vh;

@@ -1711,15 +1711,15 @@ class HomeComponent {
     toggleShowRight() {
         this.showRight = !this.showRight;
         if (this.showRight == true) {
-            this.middleStyle = 0;
+            this.middleMarginRight = 0;
         }
         else {
-            this.middleStyle = 367;
+            this.middleMarginRight = 367;
         }
     }
     clickToHideRight() {
         this.showRight = true;
-        this.middleStyle = 0;
+        this.middleMarginRight = 0;
     }
     toggleDeleteSubTaskButton(id_subTask, title_subTask) {
         this.id_subTask = id_subTask;
@@ -1848,7 +1848,7 @@ class HomeComponent {
             this.showTaskDetail(this.id_task, this.title_task);
             this.showDeleteTaskConfirm = true;
             this.showRight = true;
-            this.middleStyle = 0;
+            this.middleMarginRight = 0;
         }, error => { alert('Server error'); });
     }
     // task right function

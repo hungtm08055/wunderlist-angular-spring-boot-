@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { formatDate } from "@angular/common";
 import {interval, Subscription} from 'rxjs';
@@ -55,12 +55,18 @@ export class HomeComponent implements OnInit {
   showLogoutButton = true;
   showAlertLayout = true;
   showRight = true;
-  public autoLoad: string;
   selectedFile = null;
   event: MouseEvent;
   clientX = 0;
   clientY = 0;
-  public middleStyle;
+  public leftDisplay = 'block';
+  public middleDisplay = 'block';
+  public hiddenClass = 'block';
+  public middleMarginRight;
+  public middleMarginLeft = 280;
+  public rightWidth = 367;
+  public rightWidthPercent;
+  public leftWidth = 280;
   public currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
   public currentTime = formatDate(new Date(), 'HH:mm', 'en');
   public listArray: List[] = [];
@@ -72,12 +78,17 @@ export class HomeComponent implements OnInit {
   public fileArray: FileModel[] = [];
   public searchResultArray: Task[] = [];
   subscription: Subscription;
+  public innerWidth: any;
+
   constructor(private homeService: HomeService,
               private route: ActivatedRoute,
               private router: Router) {
   }
 
   ngOnInit(): void {
+    this.innerWidth = window.innerWidth;
+    this.onResize(event);
+
     // session user login
     this.username = sessionStorage.getItem('username');
     this.user_id = sessionStorage.getItem('user_id');
@@ -101,6 +112,52 @@ export class HomeComponent implements OnInit {
     this.file = new FileModel();
   }
 
+  // get window size
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.innerWidth = window.innerWidth;
+    console.log(this.innerWidth)
+
+    // toggle left width
+    if (this.innerWidth <= 1000) {
+      this.leftWidth = 42;
+      this.middleMarginLeft = 42;
+      this.hiddenClass = 'none';
+    } else {
+      this.hiddenClass = 'block';
+      this.leftWidth = 280;
+      this.middleMarginLeft = 280;
+    }
+
+    // toggle right width
+    if (this.innerWidth <= 546) {
+      if (this.showRight == false) {
+        this.middleDisplay ='none';
+        this.leftDisplay = 'none';
+        this.rightWidthPercent = '100';
+        this.rightWidth = 546;
+      } else {
+        this.middleDisplay ='block';
+        this.leftDisplay = 'block';
+      }
+    } else {
+      this.middleDisplay ='block';
+      this.leftDisplay = 'block';
+      this.rightWidth = 367;
+    }
+  }
+
+  toggleLeft() {
+    if (this.hiddenClass === 'block') {
+      this.hiddenClass = 'none';
+      this.leftWidth = 42;
+      this.middleMarginLeft = 42;
+    } else {
+      this.middleMarginLeft = 280;
+      this.leftWidth = 280;
+      this.hiddenClass = 'block';
+    }
+  }
   // style
   clickOutside() {
     this.showDeleteListButton = true;
@@ -159,36 +216,29 @@ export class HomeComponent implements OnInit {
     this.showTaskCompleted();
     this.inputSearch = '';
     this.searchResultArray = null;
-    this.autoLoad = 'true';
-    if (this.autoLoad === 'true') {
-      this.secondsCounter = interval(3000);
-      this.subscription = this.secondsCounter.subscribe(success => {
-        this.currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
-        this.currentTime = formatDate(new Date(), 'HH:mm', 'en');
-        this.showAlertLayout = true;
-        this.showTaskUncompleted();
-        this.showTaskCompleted();
-        console.log(this.autoLoad+" --- subscribe")
-      });
-    } else {
-        this.subscription.unsubscribe();
-        console.log(this.autoLoad+" --- unsubscribed");
-    }
+    this.secondsCounter = interval(3000);
+    this.subscription = this.secondsCounter.subscribe(success => {
+      this.currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
+      this.currentTime = formatDate(new Date(), 'HH:mm', 'en');
+      this.showAlertLayout = true;
+      this.showTaskUncompleted();
+      this.showTaskCompleted();
+    });
   }
 
   toggleShowRight() {
     this.showRight = !this.showRight;
     if (this.showRight == true) {
-      this.middleStyle = 0;
+      this.middleMarginRight = 0;
     }
     else {
-      this.middleStyle = 367;
+      this.middleMarginRight = 367;
     }
   }
 
   clickToHideRight() {
     this.showRight = true;
-    this.middleStyle = 0;
+    this.middleMarginRight = 0;
   }
 
   toggleDeleteSubTaskButton(id_subTask: string, title_subTask) {
@@ -372,7 +422,7 @@ export class HomeComponent implements OnInit {
         this.showTaskDetail(this.id_task, this.title_task)
         this.showDeleteTaskConfirm = true;
         this.showRight = true;
-        this.middleStyle = 0;
+        this.middleMarginRight = 0;
       },error => { alert('Server error') }
     )
   }
@@ -550,8 +600,7 @@ export class HomeComponent implements OnInit {
 
   // show search result
   searchResult(inputSearch: string) {
-    this.autoLoad = 'false';
-    console.log(this.autoLoad+" --- run search input")
+    this.subscription.unsubscribe();
     this.inputSearch = inputSearch;
     if (this.inputSearch.trim() == '') {
       this.homeService.searchTask(this.inputSearch).subscribe(

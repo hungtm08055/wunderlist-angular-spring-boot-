@@ -3981,7 +3981,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             _this14.showDeleteTaskConfirm = true;
             _this14.showRight = true;
-            _this14.middleStyle = 0;
+            _this14.middleMarginRight = 0;
           }, function (error) {
             alert('Server error');
           });
