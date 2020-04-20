@@ -35,8 +35,8 @@ export class LoginComponent implements OnInit {
             sessionStorage.setItem("user_id", success.id);
             sessionStorage.setItem("username", this.user.username);
           }
-        },
-        error => { alert('Server not found')}
+        }
+        // error => { alert('Not Found User')}
       )
     }
 

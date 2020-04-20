@@ -14,14 +14,14 @@ public class ListItem extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
 //    @NotNull
     @Column(name = "title")
-    public String title;
+    private String title;
 
     @Column(name = "email")
-    public String email;
+    private String email;
 
     public long getId() {
         return id;

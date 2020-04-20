@@ -32,9 +32,13 @@ public class FileItemService {
         return fileItemRepository.save(fileItem);
     }
 
-    public void delete(long id)
+    public boolean delete(long id)
     {
-        fileItemRepository.deleteById(id);
+        if (fileItemRepository.findById(id).isPresent()) {
+            fileItemRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public List<FileItemDTO> findFileByTaskID(long id)

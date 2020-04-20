@@ -32,9 +32,13 @@ public class SubtaskItemService {
         return subtaskItemRepository.save(subtaskItem);
     }
 
-    public void delete(long id)
+    public boolean delete(long id)
     {
-        subtaskItemRepository.deleteById(id);
+        if(subtaskItemRepository.findById(id).isPresent()) {
+            subtaskItemRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public List<SubtaskItemDTO> findAllSubTaskByTask(long id) {

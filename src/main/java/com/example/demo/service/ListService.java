@@ -45,8 +45,19 @@ public class ListService {
         }
         return false;
     }
-    public Iterable<ListItem> findAllListbyUserID(long user_id)
+
+    public List<ListItem> findAllListbyUserID(long user_id)
     {
-        return listRepository.findListItemByUser(user_id);
+        List<ListItem> listItems = listRepository.findListItemByUser(user_id);
+        List<ListItem> listItems1 = new ArrayList<>();
+        for (ListItem listItem : listItems)
+        {
+            ListItem listItem1 = new ListItem();
+            listItem1.setId((int) listItem.getId());
+            listItem1.setTitle(listItem.getTitle());
+            listItem1.setCreateDate(listItem.getCreateDate());
+            listItems1.add(listItem1);
+        }
+        return listItems1;
     }
 }

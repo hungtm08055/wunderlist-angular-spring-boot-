@@ -2,27 +2,20 @@ package com.example.demo.restAPI;
 
 import com.example.demo.DTO.FileItemDTO;
 import com.example.demo.domain.FileItem;
-import com.example.demo.domain.MyUploadForm;
 import com.example.demo.domain.TaskItem;
 import com.example.demo.service.FileItemService;
 import com.example.demo.service.TaskItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import java.awt.print.Pageable;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,37 +30,45 @@ public class FileItemRestAPI {
     @Autowired
     TaskItemService taskItemService;
 
-    @GetMapping("/file/showFilebyTaskID")
+    @GetMapping("/file/showFilebyTaskID") // tested
     public List<FileItemDTO> findFileItem(@RequestParam(name = "task_id") long id)
     {
         List<FileItemDTO> fileItemDTOS = fileItemService.findFileByTaskID(id);
         return fileItemDTOS;
     }
 
-    @DeleteMapping("file/delete")
-    public void delete(@RequestParam(name = "id") long id, @RequestParam(name = "file_name") String filename)
+    @DeleteMapping("file/delete") // tested
+    public ResponseEntity<Void> delete(@RequestParam(name = "id") long id, @RequestParam(name = "file_name") String filename)
     {
-        String path = "src/main/resources/frontend/angular-app/src/assets/upload/" + filename;
-        File file = new File(path);
-        file.delete();
-        fileItemService.delete(id);
+        if (fileItemService.delete(id)) {
+            String path = "src/main/resources/frontend/angular-app/src/assets/upload/" + filename;
+            File file = new File(path);
+            file.delete();
+            fileItemService.delete(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     // POST: Xử lý Upload
-    @PostMapping("/uploadOneFile")
-    public FileItem uploadOneFileHandlerPOST(@ModelAttribute("file") MultipartFile[] file,
-                                              @Validated FileItemDTO fileItemDTO,
-                                              @RequestParam(name = "task_id") long id)
+    @PostMapping("/uploadOneFile") // tested
+    public ResponseEntity<FileItem> uploadOneFileHandlerPOST(@ModelAttribute("file") MultipartFile[] file,
+                                                             @Validated FileItemDTO fileItemDTO,
+                                                             @RequestParam(name = "task_id") long id)
     {
         Optional<TaskItem> taskItem = taskItemService.findOne(id);
-        FileItem fileItem = new FileItem();
-        String name = this.doUpload(file);
-        fileItem.setTitle(name);
-        fileItem.setId(fileItemDTO.getId());
-        fileItem.setCreateDate(fileItemDTO.getCreateDate());
-        fileItem.setTaskItem(taskItem.get());
-        fileItem = fileItemService.save(fileItem);
-        return fileItem;
+        if (!taskItem.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            FileItem fileItem = new FileItem();
+            String name = this.doUpload(file);
+            fileItem.setTitle(name);
+            fileItem.setId(fileItemDTO.getId());
+            fileItem.setCreateDate(fileItemDTO.getCreateDate());
+            fileItem.setTaskItem(taskItem.get());
+            fileItem = fileItemService.save(fileItem);
+            return new ResponseEntity<>(fileItem,HttpStatus.CREATED);
+        }
     }
 
 //    https://o7planning.org/vi/11679/vi-du-upload-file-voi-spring-boot
@@ -118,9 +119,6 @@ public class FileItemRestAPI {
         return name;
     }
 }
-
-
-
 //    @PostMapping("/file/upload")
 //    public ResponseEntity uploadVideoForExercise(@RequestHeader("file") MultipartFile file) throws IOException {
 //        if (fileItemService.storeFile(file)) {

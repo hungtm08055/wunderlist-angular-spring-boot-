@@ -54,14 +54,19 @@ public class TaskItemService {
         return taskItemRepository.save(taskItem);
     }
 
-    public void delete(long id)
+    public boolean delete(long id)
     {
-        taskItemRepository.deleteById(id);
+        if(taskItemRepository.findById(id).isPresent()) {
+            taskItemRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
+    // tested
     public List<TaskItemDTO> findTaskItemName(String title)
     {
-        List<TaskItem> taskItems = (List<TaskItem>) taskItemRepository.findAllByTitle(title);
+        List<TaskItem> taskItems = taskItemRepository.findAllByTitle(title);
         List<TaskItemDTO> taskItemDTOS = new ArrayList<>();
         for (TaskItem taskItem : taskItems)
         {
@@ -78,9 +83,10 @@ public class TaskItemService {
         return taskItemDTOS;
     }
 
+
     public List<TaskItemDTO> findAllTaskByList(long id,long status)
     {
-        List<TaskItem> taskItems = (List<TaskItem>) taskItemRepository.findTaskItemByListItem(id,status);
+        List<TaskItem> taskItems =  taskItemRepository.findTaskItemByListItem(id,status);
         List<TaskItemDTO> taskItemDTOS = new ArrayList<>();
         for (TaskItem taskItem : taskItems)
         {
@@ -99,7 +105,7 @@ public class TaskItemService {
 
     public List<TaskItemDTO> findTaskByID(long id)
     {
-        List<TaskItem> taskItems = (List<TaskItem>) taskItemRepository.findTaskItemById(id);
+        List<TaskItem> taskItems =  taskItemRepository.findTaskItemById(id);
         List<TaskItemDTO> taskItemDTOS = new ArrayList<>();
         for (TaskItem taskItem : taskItems)
         {

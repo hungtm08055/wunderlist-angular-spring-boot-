@@ -12,11 +12,11 @@ public class CommentItem extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
     @NotNull
     @Column(name = "title")
-    public String title;
+    private String title;
 
     public long getId() {
         return id;

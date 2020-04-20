@@ -12,10 +12,10 @@ public class FileItem extends TimeStamp{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
     @Column(name = "title")
-    public String title;
+    private String title;
 
     public String getTitle() {
         return title;

@@ -7,24 +7,34 @@ import javax.validation.constraints.NotNull;
 @Table(name = "user")
 public class User extends TimeStamp {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private Long id;
 
-    //@NotNull
+    @NotNull
     @Column(name = "username")
-    public String username;
+    private String username;
 
     @NotNull
     @Column(name = "password")
-    public String password;
+    private String password;
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        super();
+    }
 
 
-    public long getId() {
+
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

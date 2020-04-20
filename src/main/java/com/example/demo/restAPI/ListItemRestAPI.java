@@ -24,69 +24,71 @@ public class ListItemRestAPI {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/list/getAll")
-    public List<ListItemDTO> getAll()
-    {
-        return listService.findAll();
-    }
+//    @GetMapping("/list/getAll")
+//    public List<ListItemDTO> getAll()
+//    {
+//        return listService.findAll();
+//    }
+//
+//    @GetMapping("/list/getID/{id}")
+//    public Optional<ListItem> getByID(@PathVariable("id") String id)
+//    {
+//        Optional<ListItem> list = listService.findOne((Long.valueOf(id)));
+//
+//        if (!list.isPresent())
+//        {
+//            System.out.println("Not found ID");
+//        }
+//        else
+//        {
+//            list = listService.findOne((Long.valueOf(id)));
+//        }
+//        return list;
+//    }
 
-    @GetMapping("/list/getID/{id}")
-    public Optional<ListItem> getByID(@PathVariable("id") String id)
-    {
-        Optional<ListItem> list = listService.findOne((Long.valueOf(id)));
-
-        if (!list.isPresent())
-        {
-            System.out.println("Not found ID");
-        }
-        else
-        {
-            list = listService.findOne((Long.valueOf(id)));
-        }
-        return list;
-    }
-
-    @GetMapping("list/getListByUserID")
+    @GetMapping("list/getListByUserID") // tested
     public List<ListItem> findAllListByUserID(@RequestParam(name = "user_id") long user_id)
     {
-        List<ListItem> listItems = (List<ListItem>) listService.findAllListbyUserID(user_id);
-
+        List<ListItem> listItems = listService.findAllListbyUserID(user_id);
         return listItems;
     }
 
-    @PostMapping("/list/add")
-    public ListItem add(@RequestBody ListItemDTO listItemDTO, @RequestParam(name = "user_id") long id)
-    {
+    @PostMapping("/list/add") // tested
+    public ResponseEntity<ListItem> add(@RequestBody ListItemDTO listItemDTO, @RequestParam(name = "user_id") long id) {
         Optional<User> user = userService.findOne(id);
-        ListItem listItem = new ListItem();
-        String title = listItemDTO.getTitle();
-        listItem.setTitle(title.replace("\"",""));
-        listItem.setEmail(listItemDTO.getEmail());
-        listItem.setUser(user.get());
-        listService.save(listItem);
-        return listItem;
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            ListItem listItem = new ListItem();
+            String title = listItemDTO.getTitle();
+            listItem.setTitle(title.replace("\"",""));
+            listItem.setEmail(listItemDTO.getEmail());
+            listItem.setUser(user.get());
+            listService.save(listItem);
+            return new ResponseEntity<>(listItem, HttpStatus.CREATED);
+        }
+
     }
 
-    @PutMapping("/list/update")
-    public ListItem update(@RequestBody ListItemDTO listItemDTO,@RequestParam(name = "id") long id)
+    @PutMapping("/list/update") // tested
+    public ResponseEntity<ListItem> update(@RequestBody ListItemDTO listItemDTO,@RequestParam(name = "id") long id)
     {
         Optional<ListItem> listItem = listService.findOne(id);
-        ListItem listItem1 = listItem.get();
-
         if (!listItem.isPresent())
         {
-            return null;
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else
         {
+            ListItem listItem1 = listItem.get();
             listItem1.setTitle(listItemDTO.getTitle().replace("\"",""));
             listService.save(listItem1);
+            return new ResponseEntity<>(listItem1,HttpStatus.OK);
         }
-        return listItem1;
 
     }
 
-    @DeleteMapping("/list/delete")
+    @DeleteMapping("/list/delete") // tested
     public ResponseEntity<Void> deleteByID(@RequestParam(name = "id") long id)
     {
        if (listService.delete(id)) {

@@ -29,9 +29,13 @@ public class CommentItemService {
         return commentItemRepository.save(commentItem);
     }
 
-    public void delete(long id)
+    public boolean delete(long id)
     {
-        commentItemRepository.deleteById(id);
+        if(commentItemRepository.findById(id).isPresent()) {
+            commentItemRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public List<CommentItemDTO> findAllCommentByTask(long id) {

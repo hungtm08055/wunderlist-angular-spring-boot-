@@ -12,22 +12,22 @@ public class TaskItem extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
     @Column(name = "title")
-    public String title;
+    private String title;
 
     @Column(name = "status")
-    public int status = 0;
+    private int status = 0;
 
     @Column(name = "star")
-    public int star = 0;
+    private int star = 0;
 
     @Column(name = "duedate")
-    public String duedate;
+    private String duedate;
 
     @Column(name = "reminder")
-    public String reminder;
+    private String reminder;
 
     public long getId() {
         return id;

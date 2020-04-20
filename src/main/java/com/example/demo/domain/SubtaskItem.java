@@ -12,14 +12,14 @@ public class SubtaskItem extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
     @NotNull
     @Column(name = "title")
-    public String title;
+    private String title;
 
     @Column(name = "status")
-    public int status = 0;
+    private int status = 0;
 
     public long getId() {
         return id;

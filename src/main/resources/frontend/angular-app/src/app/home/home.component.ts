@@ -216,7 +216,7 @@ export class HomeComponent implements OnInit {
     this.showTaskCompleted();
     this.inputSearch = '';
     this.searchResultArray = null;
-    this.secondsCounter = interval(3000);
+    this.secondsCounter = interval(30000);
     this.subscription = this.secondsCounter.subscribe(success => {
       this.currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
       this.currentTime = formatDate(new Date(), 'HH:mm', 'en');
@@ -321,6 +321,8 @@ export class HomeComponent implements OnInit {
         this.showTaskUncompleted();
         this.showTaskCompleted();
         this.showDeleteListConfirm = true;
+        this.showRight = true;
+        this.middleMarginRight = 0;
         this.title_list = '';
       },error => { alert('Server error') }
     )
